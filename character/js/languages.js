@@ -1,14 +1,11 @@
 /*
-addBonusLanguages() - returns Randomly selected WARRIOR Bonus Languages
+addBonusLanguages() - returns Randomly selected ELF Bonus Languages
 */
 function addBonusLanguages() {
 	var bonusLanguages = [
 		{"language": "Alignment Tongue"},
-		{"language": "Elf"},
 		{"language": "Halfling"},
 		{"language": "Dwarf"},
-		{"language": "Gnome"},
-		{"language": "Bugbear"},
 		{"language": "Lizard man"},
 		{"language": "Harpy"},
 		{"language": "Goblin"},
@@ -23,29 +20,28 @@ function addBonusLanguages() {
 		{"language": "Angelic"},
 		{"language": "Centaur"},
 		{"language": "Demonic"},
-		{"language": "Doppelganger"},
 		{"language": "Dragon"},
 		{"language": "Pixie"},
-		{"language": "Giant"},
 		{"language": "Naga"},
-		{"language": "Bear"},
 		{"language": "Eagle"},
 		{"language": "Horse"},
-		{"language": "Wolf"},
-		{"language": "Spider"},
 		{"language": "Undercommon"}
 			];
     return bonusLanguages[Math.floor(Math.random() * bonusLanguages.length)]; 
 }
+
 		
 	  
 /*
 getBonusLanguages() returns the bonus languages that a character may have due to high intelligence or the Lucky Sign of Bird Song.  A for loop is used to prevent duplicates of languages.
 */
 function getBonusLanguages (intelligenceModifier, luckySign, luckModifier) {
-	var bonusLanguages = 0;
+	var bonusLanguages = 1;
 	if(bonusLanguages  != undefined && typeof bonusLanguages === 'number') {
-		bonusLanguages = intelligenceModifier;
+		if(intelligenceModifier > 0)
+		{
+			bonusLanguages += intelligenceModifier;
+		}
 	}
 	else {
 		return "";
@@ -61,7 +57,7 @@ function getBonusLanguages (intelligenceModifier, luckySign, luckModifier) {
 	var result = ", " + addBonusLanguages().language, newLanguage = "";
 	
 	// loop
-	for(var i = 1; i < (bonusLanguages * 2); i++){
+	for(var i = 1; i < bonusLanguages; i++){
 		// 1) get a random lang
 		newLanguage = addBonusLanguages().language;
 		// 2) check the new lang is not repeative

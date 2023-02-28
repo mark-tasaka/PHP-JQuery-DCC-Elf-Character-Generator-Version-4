@@ -12,11 +12,11 @@ function getHitPoints (level, staminaMod)
             {
 
                 var hpEachLevel = 0;
-                hpEachLevel = Math.floor((Math.random() * 4) + 1) + staminaMod;
+                hpEachLevel = Math.floor((Math.random() * 6) + 1) + staminaMod;
 
-                if(hpEachLevel < 2)
+                if(hpEachLevel < 3)
                     {
-                        hpEachLevel = 2;
+                        hpEachLevel = 3;
                     }
 
                 hitPoints += hpEachLevel;

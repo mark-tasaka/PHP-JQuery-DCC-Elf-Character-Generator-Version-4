@@ -41,6 +41,7 @@
     include 'php/xp.php';
     include 'php/nameSelect.php';
     include 'php/gender.php';
+    include 'php/armour.php';
     include 'php/patron.php';
     include 'php/familiar.php';
 
@@ -253,14 +254,14 @@
         {
             rsort($abilityScoreArray);
 
-            $strength = $abilityScoreArray[5];
-            $agility = $abilityScoreArray[4];
+            $strength = $abilityScoreArray[2];
+            $agility = $abilityScoreArray[1];
             $stamina = $abilityScoreArray[3];
-            $personality = $abilityScoreArray[1];
+            $personality = $abilityScoreArray[5];
             $intelligence = $abilityScoreArray[0];
-            $luck = $abilityScoreArray[2];
+            $luck = $abilityScoreArray[4];
 
-            $optimizeAbilityScoreMessage = "<br/>Ability Scores optimized in the order of Int, Per, Luck, Sta, Agi, Str.";
+            $optimizeAbilityScoreMessage = "<br/>Ability Scores optimized in the order of Int, Agi, Str, Sta, Luck, Per.";
         }
         else
         {
@@ -286,8 +287,41 @@
 
     $nameGenMessage = getNameDescript($givenName, $surname);
 
+        
+    if(isset($_POST["theArmour"]))
+    {
+        $armour = $_POST["theArmour"];
+    }
 
-       $speed = 30;
+    $armourName = getArmour($armour)[0];
+    
+    $armourACBonus = getArmour($armour)[1];
+    $armourCheckPen = getArmour($armour)[2];
+    $armourSpeedPen = getArmour($armour)[3];
+    $armourFumbleDie = getArmour($armour)[4];
+
+    if(isset($_POST['theCheckBoxShield']) && $_POST['theCheckBoxShield'] == 1) 
+    {
+        $shieldName = getArmour(10)[0];
+        $shieldACBonus = getArmour(10)[1];
+        $shieldCheckPen = getArmour(10)[2];
+        $shieldSpeedPen = getArmour(10)[3];
+        $shieldFumbleDie = getArmour(10)[4];
+    }
+    else
+    {
+        $shieldName = getArmour(11)[0];
+        $shieldACBonus = getArmour(11)[1];
+        $shieldCheckPen = getArmour(11)[2];
+        $shieldSpeedPen = getArmour(11)[3];
+        $shieldFumbleDie = getArmour(11)[4];
+    } 
+
+   $totalAcDefense = $armourACBonus + $shieldACBonus;
+   $totalAcCheckPen = $armourCheckPen + $shieldCheckPen;
+   $speedPenality = $armourSpeedPen;
+
+   $speed = 30 - $armourSpeedPen;
 
        $reflexBase = savingThrowReflex($level);
        $fortBase = savingThrowFort($level);
@@ -504,6 +538,65 @@
         
         <span id="speed"></span>
 
+        
+              
+       <span id="armourName">
+           <?php
+           if($armourName == "")
+           {
+               echo $shieldName;
+           }
+           else if($shieldName == "")
+           {
+                echo $armourName;
+           }
+           else
+           {
+            echo $armourName . " & " . $shieldName;
+           }
+           ?>
+        </span>
+
+        <span id="armourACBonus">
+            <?php
+                echo $totalAcDefense;
+            ?>
+        </span>
+
+        
+        <span id="armourACCheckPen">
+            <?php
+                echo $totalAcCheckPen;
+            ?>
+        </span>
+        
+        <span id="armourACSpeedPen">
+            <?php
+            if($speedPenality == 0)
+            {
+                echo "-";
+            }
+            else
+            {
+                echo "-" . $speedPenality;
+            }
+            ?>
+        </span>
+
+        <span id="fumbleDie">
+            <?php
+            if($armourName == "")
+            {
+                echo $shieldFumbleDie;
+            }
+            else
+            {
+                echo $armourFumbleDie;
+            }
+            ?>
+        </span>
+
+
 
         <span id="criticalDieTable">
             <?php
@@ -620,7 +713,7 @@
               {
                   echo " & ";
               }
-              elseif($counter > $gearCount-1)
+              else if($counter > $gearCount-1)
               {
                   echo ".";
               }
@@ -671,6 +764,7 @@
         let luckMod = <?php echo $luckMod ?>;
         let level = '<?php echo $level ?>';
         let gender = '<?php echo $gender ?>';
+        let armour = '<?php echo $armourName ?>';
 	    let	profession = getOccupation();
 	    let birthAugur = getLuckySign();
         let bonusLanguages = getBonusLanguages(intelligenceMod, birthAugur, luckMod);
@@ -697,8 +791,8 @@
             "move": <?php echo $speed ?> + addLuckToSpeed (birthAugur, luckMod),
             "trainedWeapon": profession.trainedWeapon,
             "tradeGoods": profession.tradeGoods,
-            "addLanguages": "Common" + bonusLanguages,
-            "armourClass": baseAC,
+            "addLanguages": "Common, Elf" + bonusLanguages,
+            "armourClass": <?php echo $totalAcDefense ?> + baseAC,
             "hp": getHitPoints (level, staminaMod) + hitPointAdjustPerLevel(birthAugur,  luckMod),
             "attackBonus": attackBonus,
             "spellCheck": <?php echo $level ?> + intelligenceMod,
